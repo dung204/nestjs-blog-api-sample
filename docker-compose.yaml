@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_DB: nestjs_blog_api_sample_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    networks:
+      - nestjs-blog-api-sample-network
+networks:
+  nestjs-blog-api-sample-network:
+    driver: bridge
