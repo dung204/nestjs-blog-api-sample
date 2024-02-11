@@ -3,32 +3,32 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({ schema: 'public', name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('character varying', { length: 100, unique: true })
-  email: string;
+  email!: string;
 
   @Column('character varying', { length: 100 })
-  password: string;
+  password!: string;
 
   @Column('character varying', { length: 64 })
-  firstName: string;
+  firstName!: string;
 
   @Column('character varying', { length: 64 })
-  lastName: string;
+  lastName!: string;
 
   @Column('character varying', { length: 256, nullable: true })
-  address: string;
+  address: string | null = null;
 
   @Column('character varying', { length: 256, nullable: true })
-  avatarUrl: string;
+  avatarUrl: string | null = null;
 
   @Column('boolean', { default: 'true' })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @Column('timestamp with time zone', { default: () => 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }
