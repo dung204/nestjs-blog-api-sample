@@ -3,6 +3,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AppModule } from '@/app.module';
 import { DeleteInterceptor } from '@/interceptors/delete.interceptor';
 import { HttpExceptionFilter } from '@/filters/http-exception.filter';
+import { configSwagger } from '@/config/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +19,8 @@ async function bootstrap() {
     type: VersioningType.URI,
     defaultVersion: ['1'],
   });
+
+  configSwagger(app);
 
   await app.listen(3000);
 }
