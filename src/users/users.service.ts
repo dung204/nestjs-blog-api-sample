@@ -4,7 +4,9 @@ import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/users/entities/user.entity';
-import PaginatedResponse from '@/common/interfaces/PaginatedResponse';
+import PaginationOptionsDto from '@/common/dto/pagination-options.dto';
+import PaginationDto from '@/common/dto/pagination.dto';
+import PaginationMetaDto from '@/common/dto/pagination-meta.dto';
 
 @Injectable()
 export class UsersService {
@@ -21,23 +23,25 @@ export class UsersService {
   }
 
   async findAll(
-    limit: number,
-    page: number,
-  ): Promise<PaginatedResponse<User[]>> {
+    paginationOptionsDto: PaginationOptionsDto,
+  ): Promise<PaginationDto<User>> {
+    const { page, limit, order, orderBy } = paginationOptionsDto;
+
     const [users, totalCount] = await this.userRepository.findAndCount({
       take: limit,
       skip: (page - 1) * limit,
+      order: {
+        [orderBy]: order,
+      },
     });
 
-    return {
-      data: users,
-      meta: {
-        page,
-        limit,
+    return new PaginationDto(
+      users,
+      new PaginationMetaDto({
+        paginationOptionsDto,
         totalCount,
-        hasNextPage: page * limit < totalCount,
-      },
-    };
+      }),
+    );
   }
 
   async findOne(id: string) {

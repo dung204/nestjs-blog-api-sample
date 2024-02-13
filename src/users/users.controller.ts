@@ -7,12 +7,12 @@ import {
   Param,
   Delete,
   Query,
-  ParseIntPipe,
   HttpCode,
 } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UpdateUserDto } from '@/users/dto/update-user.dto';
+import PaginationOptionsDto from '@/common/dto/pagination-options.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,11 +24,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll(
-    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
-    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
-  ) {
-    return this.usersService.findAll(limit, page);
+  findAll(@Query() paginationOptionsDto: PaginationOptionsDto) {
+    return this.usersService.findAll(paginationOptionsDto);
   }
 
   @Get(':id')
