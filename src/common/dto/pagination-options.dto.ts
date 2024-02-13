@@ -1,10 +1,10 @@
 import { Order } from '@/common/enums/Order';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsEnum, IsInt } from 'class-validator';
+import { IsEnum, IsInt, IsString } from 'class-validator';
 
 export default class PaginationOptionsDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The current page number',
     default: 1,
   })
@@ -12,7 +12,7 @@ export default class PaginationOptionsDto {
   @IsInt()
   readonly page: number = 1;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The number of items in a page',
     default: 10,
   })
@@ -20,7 +20,7 @@ export default class PaginationOptionsDto {
   @IsInt()
   readonly limit: number = 10;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'The order of the items',
     enum: Order,
     default: Order.ASC,
@@ -29,5 +29,10 @@ export default class PaginationOptionsDto {
   @IsEnum(Order)
   readonly order: Order = Order.ASC;
 
+  @ApiPropertyOptional({
+    description: 'The field to order the items by',
+    default: 'createdAt',
+  })
+  @IsString()
   readonly orderBy: string = 'createdAt';
 }
