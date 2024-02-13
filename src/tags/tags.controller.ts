@@ -7,12 +7,12 @@ import {
   Param,
   Delete,
   Query,
-  ParseIntPipe,
   HttpCode,
 } from '@nestjs/common';
 import { TagsService } from '@/tags/tags.service';
 import { CreateTagDto } from '@/tags/dto/create-tag.dto';
 import { UpdateTagDto } from '@/tags/dto/update-tag.dto';
+import PaginationOptionsDto from '@/common/dto/pagination-options.dto';
 
 @Controller('tags')
 export class TagsController {
@@ -24,11 +24,8 @@ export class TagsController {
   }
 
   @Get()
-  findAll(
-    @Query('page', new ParseIntPipe({ optional: true })) page: number = 1,
-    @Query('limit', new ParseIntPipe({ optional: true })) limit: number = 10,
-  ) {
-    return this.tagsService.findAll(page, limit);
+  findAll(@Query() paginationOptionsDto: PaginationOptionsDto) {
+    return this.tagsService.findAll(paginationOptionsDto);
   }
 
   @Get(':id')
