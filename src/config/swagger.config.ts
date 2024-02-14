@@ -16,5 +16,8 @@ export function configSwagger(app: INestApplication) {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/api-docs', app, document);
+  SwaggerModule.setup('/api-docs', app, document, {
+    customSiteTitle: 'NestJS Blog Sample API Documentation',
+    customfavIcon: 'https://nestjs.com/img/favicon.ico',
+  });
 }
