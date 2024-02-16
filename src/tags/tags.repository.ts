@@ -31,4 +31,10 @@ export class TagsRepository extends Repository<Tag> {
   async findOneById(id: string) {
     return this.selectQueryBuilder.where('tag.id = :id', { id }).getOne();
   }
+
+  async findSomeByIds(ids: string[]) {
+    return this.selectQueryBuilder
+      .where('tag.id IN (:...ids)', { ids })
+      .getMany();
+  }
 }

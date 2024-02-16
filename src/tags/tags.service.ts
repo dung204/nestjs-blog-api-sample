@@ -28,6 +28,10 @@ export class TagsService {
     return tag;
   }
 
+  async findSome(ids: string[]) {
+    return this.tagsRepository.findSomeByIds(ids);
+  }
+
   async update(id: string, updateTagDto: UpdateTagDto) {
     const tag = await this.findOne(id);
 
