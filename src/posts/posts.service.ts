@@ -18,16 +18,15 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto) {
-    const user = await this.usersService.findOne(createPostDto.userId);
+    const { userId, tagIds, title, content } = createPostDto;
 
-    const tags = !createPostDto.tagIds
-      ? []
-      : await Promise.all(
-          createPostDto.tagIds.map((tagId) => this.tagsService.findOne(tagId)),
-        );
+    const user = await this.usersService.findOne(userId);
+
+    const tags = !tagIds ? [] : await this.tagsService.findSome(tagIds);
 
     const post = this.postsRepository.create({
-      ...createPostDto,
+      title,
+      content,
       user,
       tags,
     });
