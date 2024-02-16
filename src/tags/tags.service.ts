@@ -1,18 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTagDto } from '@/tags/dto/create-tag.dto';
 import { UpdateTagDto } from '@/tags/dto/update-tag.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Tag } from '@/tags/entities/tag.entity';
 import PaginationOptionsDto from '@/common/dto/pagination-options.dto';
-import PaginationDto from '@/common/dto/pagination.dto';
-import PaginationMetaDto from '@/common/dto/pagination-meta.dto';
+import { TagsRepository } from '@/tags/tags.repository';
 
 @Injectable()
 export class TagsService {
   constructor(
-    @InjectRepository(Tag)
-    private tagsRepository: Repository<Tag>,
+    @Inject(TagsRepository)
+    private tagsRepository: TagsRepository,
   ) {}
 
   create(createTagDto: CreateTagDto) {
@@ -20,34 +16,20 @@ export class TagsService {
     return this.tagsRepository.save(tag);
   }
 
-  async findAll(
-    paginationOptionsDto: PaginationOptionsDto,
-  ): Promise<PaginationDto<Tag>> {
-    const { page, limit, order, orderBy } = paginationOptionsDto;
-
-    const [tags, totalCount] = await this.tagsRepository.findAndCount({
-      take: limit,
-      skip: (page - 1) * limit,
-      order: {
-        [orderBy]: order,
-      },
-    });
-
-    return new PaginationDto(
-      tags,
-      new PaginationMetaDto({
-        paginationOptionsDto,
-        totalCount,
-      }),
-    );
+  async findAll(paginationOptionsDto: PaginationOptionsDto) {
+    return this.tagsRepository.findAllPaginated(paginationOptionsDto);
   }
 
   async findOne(id: string) {
-    const tag = await this.tagsRepository.findOneBy({ id });
+    const tag = await this.tagsRepository.findOneById(id);
 
     if (!tag) throw new NotFoundException('Tag not found');
 
     return tag;
+  }
+
+  async findSome(ids: string[]) {
+    return this.tagsRepository.findSomeByIds(ids);
   }
 
   async update(id: string, updateTagDto: UpdateTagDto) {
