@@ -9,5 +9,6 @@ import { TagsController } from '@/tags/tags.controller';
   imports: [TypeOrmModule.forFeature([Tag]), DatabaseModule],
   controllers: [TagsController],
   providers: [TagsService],
+  exports: [TagsService],
 })
 export class TagsModule {}

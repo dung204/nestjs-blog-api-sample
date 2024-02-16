@@ -1,26 +1,72 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from '@/posts/dto/create-post.dto';
 import { UpdatePostDto } from '@/posts/dto/update-post.dto';
+import { UsersService } from '@/users/users.service';
+import { TagsService } from '@/tags/tags.service';
+import PaginationOptionsDto from '@/common/dto/pagination-options.dto';
+import { PostsRepository } from '@/posts/posts.repository';
 
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  private readonly logger: Logger = new Logger(PostsService.name);
+
+  constructor(
+    @Inject(PostsRepository)
+    private readonly postsRepository: PostsRepository,
+    private readonly usersService: UsersService,
+    private readonly tagsService: TagsService,
+  ) {}
+
+  async create(createPostDto: CreatePostDto) {
+    const user = await this.usersService.findOne(createPostDto.userId);
+
+    const tags = !createPostDto.tagIds
+      ? []
+      : await Promise.all(
+          createPostDto.tagIds.map((tagId) => this.tagsService.findOne(tagId)),
+        );
+
+    const post = this.postsRepository.create({
+      ...createPostDto,
+      user,
+      tags,
+    });
+
+    return this.postsRepository.save(post);
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll(paginationOptionsDto: PaginationOptionsDto) {
+    return this.postsRepository.findAllPaginated(paginationOptionsDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} post`;
+  async findOne(id: string) {
+    const post = await this.postsRepository.findOneById(id);
+
+    if (!post) throw new NotFoundException('Post not found!');
+
+    return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    const { title, content, tagIds } = updatePostDto;
+    const post = await this.findOne(id);
+
+    if (tagIds) {
+      post.tags = await Promise.all(
+        tagIds.map((tagId) => this.tagsService.findOne(tagId)),
+      );
+    }
+    if (title) post.title = title;
+    if (content) post.content = content;
+
+    return this.postsRepository.save(post);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: string) {
+    const user = await this.findOne(id);
+
+    if (!user) throw new NotFoundException('Post not found!');
+
+    return this.postsRepository.remove(user);
   }
 }
