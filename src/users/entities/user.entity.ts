@@ -1,5 +1,6 @@
+import { Post } from '@/posts/entities/post.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ schema: 'public', name: 'users' })
 export class User {
@@ -56,6 +57,9 @@ export class User {
   })
   @Column('character varying', { length: 256, nullable: true })
   avatarUrl: string | null = null;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts!: Post[];
 
   @ApiProperty({
     default: true,
